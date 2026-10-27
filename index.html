@@ -19,10 +19,7 @@
 
 <body>
 
-    <!-- ============================= -->
     <!-- HEADER -->
-    <!-- ============================= -->
-
     <header class="site-header">
 
         <div class="container header-content">
@@ -35,7 +32,10 @@
 
                 <div>
                     <h1>Password Generator</h1>
-                    <p>Secure Password Generator Pro</p>
+
+                    <p>
+                        Secure Password Generator Pro
+                    </p>
                 </div>
 
             </div>
@@ -49,14 +49,10 @@
     </header>
 
 
-    <!-- ============================= -->
     <!-- MAIN -->
-    <!-- ============================= -->
-
     <main class="container">
 
         <!-- HERO -->
-
         <section class="hero">
 
             <span class="section-label">
@@ -77,14 +73,12 @@
 
 
         <!-- GENERATOR -->
-
         <section class="generator-section">
 
             <div class="generator-card">
 
 
-                <!-- PASSWORD DISPLAY -->
-
+                <!-- PASSWORD RESULTS -->
                 <div class="password-display-section">
 
                     <div class="section-heading">
@@ -92,85 +86,44 @@
                         <div>
 
                             <span class="section-label">
-                                GENERATED PASSWORD
+                                GENERATED PASSWORDS
                             </span>
 
                             <h3>
-                                Your Secure Password
+                                Your Secure Passwords
                             </h3>
 
                         </div>
 
-                        <span class="unique-badge">
+                        <span
+                            class="unique-badge"
+                            id="uniqueBadge"
+                        >
                             ✓ Unique
                         </span>
 
                     </div>
 
 
-                    <div class="password-display">
-
-                        <input
-                            type="text"
-                            id="generatedPassword"
-                            placeholder="Your password will appear here"
-                            readonly
-                            aria-label="Generated password"
-                        >
-
-                        <button
-                            type="button"
-                            class="copy-button"
-                            id="copyButton"
-                        >
-                            Copy
-                        </button>
-
-                    </div>
+                    <!-- Password cards will appear here -->
+                    <div
+                        id="passwordResults"
+                        class="password-results"
+                    ></div>
 
 
                     <p
                         class="copy-message"
                         id="copyMessage"
                     >
-                        Click Generate Secure Password
-                        to create a password.
+                        Click Generate Secure Passwords
+                        to create passwords.
                     </p>
 
                 </div>
 
 
-                <!-- PASSWORD STRENGTH -->
-
-                <div class="strength-section">
-
-                    <div class="strength-header">
-
-                        <span>
-                            Password Strength
-                        </span>
-
-                        <strong id="strengthText">
-                            Not Generated
-                        </strong>
-
-                    </div>
-
-                    <div class="strength-bar">
-
-                        <div
-                            class="strength-fill"
-                            id="strengthFill"
-                            style="width: 0%;"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- SETTINGS -->
-
+                <!-- PASSWORD SETTINGS -->
                 <div class="controls-section">
 
                     <span class="section-label">
@@ -183,7 +136,6 @@
 
 
                     <!-- LENGTH -->
-
                     <div class="length-control">
 
                         <div class="control-header">
@@ -211,6 +163,7 @@
                         <div class="range-labels">
 
                             <span>8</span>
+
                             <span>64</span>
 
                         </div>
@@ -218,12 +171,45 @@
                     </div>
 
 
-                    <!-- CHARACTER OPTIONS -->
+                    <!-- NUMBER OF PASSWORDS -->
+                    <div class="count-control">
 
+                        <div class="control-header">
+
+                            <label for="passwordCount">
+                                Number of Passwords
+                            </label>
+
+                            <span id="countValue">
+                                5
+                            </span>
+
+                        </div>
+
+
+                        <input
+                            type="range"
+                            id="passwordCount"
+                            min="1"
+                            max="10"
+                            value="5"
+                        >
+
+
+                        <div class="range-labels">
+
+                            <span>1</span>
+
+                            <span>10</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CHARACTER OPTIONS -->
                     <div class="options-grid">
 
-
-                        <!-- UPPERCASE -->
 
                         <label class="option-card">
 
@@ -249,8 +235,6 @@
                         </label>
 
 
-                        <!-- LOWERCASE -->
-
                         <label class="option-card">
 
                             <input
@@ -275,8 +259,6 @@
                         </label>
 
 
-                        <!-- NUMBERS -->
-
                         <label class="option-card">
 
                             <input
@@ -300,8 +282,6 @@
 
                         </label>
 
-
-                        <!-- SYMBOLS -->
 
                         <label class="option-card">
 
@@ -330,7 +310,6 @@
 
 
                     <!-- GENERATE BUTTON -->
-
                     <button
                         type="button"
                         class="generate-button"
@@ -341,13 +320,12 @@
                             ✨
                         </span>
 
-                        Generate Secure Password
+                        Generate Secure Passwords
 
                     </button>
 
 
                     <!-- SECURITY INFO -->
-
                     <div class="security-info">
 
                         <div class="security-info-icon">
@@ -379,7 +357,6 @@
 
 
         <!-- FEATURES -->
-
         <section class="features-grid">
 
 
@@ -394,8 +371,8 @@
                 </h3>
 
                 <p>
-                    Uses secure random generation
-                    for stronger passwords.
+                    Uses cryptographically secure
+                    random generation.
                 </p>
 
             </div>
@@ -430,22 +407,36 @@
                 </h3>
 
                 <p>
-                    Choose password length and
-                    character types.
+                    Choose password length,
+                    character types and quantity.
                 </p>
 
             </div>
 
+
+            <div class="feature-card">
+
+                <div class="feature-icon">
+                    📋
+                </div>
+
+                <h3>
+                    Multiple Generation
+                </h3>
+
+                <p>
+                    Generate multiple unique
+                    passwords in one request.
+                </p>
+
+            </div>
 
         </section>
 
     </main>
 
 
-    <!-- ============================= -->
     <!-- FOOTER -->
-    <!-- ============================= -->
-
     <footer class="site-footer">
 
         <div class="container footer-content">
@@ -462,8 +453,6 @@
 
     </footer>
 
-
-    <!-- JAVASCRIPT -->
 
     <script src="script.js"></script>
 

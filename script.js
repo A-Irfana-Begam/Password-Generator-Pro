@@ -2,163 +2,65 @@
 // Password Generator Pro
 // ==========================================
 
+
+// ==========================================
 // DOM Elements
-const generatedPassword =
-    document.getElementById("generatedPassword");
+// ==========================================
+
+const passwordResults =
+    document.getElementById(
+        "passwordResults"
+    );
 
 const passwordLength =
-    document.getElementById("passwordLength");
+    document.getElementById(
+        "passwordLength"
+    );
 
 const lengthValue =
-    document.getElementById("lengthValue");
+    document.getElementById(
+        "lengthValue"
+    );
+
+const passwordCount =
+    document.getElementById(
+        "passwordCount"
+    );
+
+const countValue =
+    document.getElementById(
+        "countValue"
+    );
 
 const uppercase =
-    document.getElementById("uppercase");
+    document.getElementById(
+        "uppercase"
+    );
 
 const lowercase =
-    document.getElementById("lowercase");
+    document.getElementById(
+        "lowercase"
+    );
 
 const numbers =
-    document.getElementById("numbers");
+    document.getElementById(
+        "numbers"
+    );
 
 const symbols =
-    document.getElementById("symbols");
+    document.getElementById(
+        "symbols"
+    );
 
 const generateButton =
-    document.getElementById("generateButton");
-
-const copyButton =
-    document.getElementById("copyButton");
+    document.getElementById(
+        "generateButton"
+    );
 
 const copyMessage =
-    document.getElementById("copyMessage");
-
-const strengthText =
-    document.getElementById("strengthText");
-
-const strengthFill =
-    document.getElementById("strengthFill");
-
-
-// ==========================================
-// Character Sets
-// ==========================================
-
-const UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-const NUMBERS = "0123456789";
-const SYMBOLS = "!@#$%^&*()-_=+[]{};:,.?/";
-
-// ==========================================
-// Secure Random Character
-// ==========================================
-
-function secureRandomCharacter(characters) {
-
-    const randomArray = new Uint32Array(1);
-
-    window.crypto.getRandomValues(randomArray);
-
-    return characters[
-        randomArray[0] % characters.length
-    ];
-}
-
-
-// ==========================================
-// Secure Shuffle
-// ==========================================
-
-function secureShuffle(array) {
-
-    for (let i = array.length - 1; i > 0; i--) {
-
-        const randomArray = new Uint32Array(1);
-
-        window.crypto.getRandomValues(randomArray);
-
-        const j =
-            randomArray[0] % (i + 1);
-
-        [array[i], array[j]] =
-            [array[j], array[i]];
-    }
-
-    return array;
-}
-
-
-// ==========================================
-// Local Password Generator
-// ==========================================
-
-function generateLocalPassword(
-    length,
-    useUppercase,
-    useLowercase,
-    useNumbers,
-    useSymbols
-) {
-
-    const selectedSets = [];
-
-    if (useUppercase) {
-        selectedSets.push(UPPERCASE);
-    }
-
-    if (useLowercase) {
-        selectedSets.push(LOWERCASE);
-    }
-
-    if (useNumbers) {
-        selectedSets.push(NUMBERS);
-    }
-
-    if (useSymbols) {
-        selectedSets.push(SYMBOLS);
-    }
-
-
-    if (selectedSets.length === 0) {
-
-        throw new Error(
-            "Please select at least one character type."
-        );
-    }
-
-
-    const passwordCharacters = [];
-
-
-    // At least one character from each type
-    selectedSets.forEach(characterSet => {
-
-        passwordCharacters.push(
-            secureRandomCharacter(characterSet)
-        );
-
-    });
-
-
-    const pool =
-        selectedSets.join("");
-
-
-    while (
-        passwordCharacters.length < length
-    ) {
-
-        passwordCharacters.push(
-            secureRandomCharacter(pool)
-        );
-    }
-
-
-    secureShuffle(passwordCharacters);
-
-
-    return passwordCharacters.join("");
-}
+    document.getElementById(
+        "copyMessage"
+    );
 
 
 // ==========================================
@@ -169,35 +71,53 @@ function calculateStrength(password) {
 
     let score = 0;
 
-    const length = password.length;
 
+    if (password.length >= 8) {
 
-    if (length >= 8) {
         score += 20;
+
     }
 
-    if (length >= 12) {
+
+    if (password.length >= 12) {
+
         score += 20;
+
     }
 
-    if (length >= 16) {
+
+    if (password.length >= 16) {
+
         score += 20;
+
     }
+
 
     if (/[A-Z]/.test(password)) {
+
         score += 10;
+
     }
+
 
     if (/[a-z]/.test(password)) {
+
         score += 10;
+
     }
+
 
     if (/[0-9]/.test(password)) {
+
         score += 10;
+
     }
 
+
     if (/[^A-Za-z0-9]/.test(password)) {
+
         score += 10;
+
     }
 
 
@@ -232,66 +152,148 @@ function calculateStrength(password) {
 
 
     return {
+
         text: "Weak",
+
         percentage: 25
+
     };
 }
 
 
 // ==========================================
-// Update Strength
+// Create Password Card
 // ==========================================
 
-function updateStrength(password) {
-
-    if (!password) {
-
-        strengthText.textContent =
-            "Not Generated";
-
-        strengthFill.style.width =
-            "0%";
-
-        return;
-    }
-
+function createPasswordCard(
+    password,
+    index
+) {
 
     const strength =
-        calculateStrength(password);
+        calculateStrength(
+            password
+        );
 
 
-    strengthText.textContent =
-        strength.text;
+    const card =
+        document.createElement(
+            "div"
+        );
 
-    strengthFill.style.width =
-        strength.percentage + "%";
+    card.className =
+        "password-card";
+
+
+    card.innerHTML = `
+
+        <div class="password-number">
+            ${index + 1}
+        </div>
+
+        <div class="password-content">
+
+            <input
+                type="text"
+                class="generated-password"
+                value="${password}"
+                readonly
+            >
+
+            <div class="password-meta">
+
+                <span class="strength-badge">
+                    ${strength.text}
+                </span>
+
+                <span class="password-length">
+                    ${password.length} characters
+                </span>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="copy-password-button"
+            data-password="${encodeURIComponent(password)}"
+        >
+            Copy
+        </button>
+
+    `;
+
+
+    return card;
 }
 
 
 // ==========================================
-// Generate Password
+// Display Passwords
 // ==========================================
 
-async function generatePassword() {
+function displayPasswords(
+    passwords
+) {
+
+    passwordResults.innerHTML = "";
+
+
+    passwords.forEach(
+        (password, index) => {
+
+            const card =
+                createPasswordCard(
+                    password,
+                    index
+                );
+
+            passwordResults.appendChild(
+                card
+            );
+
+        }
+    );
+}
+
+
+// ==========================================
+// Generate Passwords
+// ==========================================
+
+async function generatePasswords() {
 
     const length =
-        parseInt(passwordLength.value);
+        parseInt(
+            passwordLength.value
+        );
+
+
+    const count =
+        parseInt(
+            passwordCount.value
+        );
 
 
     const useUppercase =
         uppercase.checked;
 
+
     const useLowercase =
         lowercase.checked;
 
+
     const useNumbers =
         numbers.checked;
+
 
     const useSymbols =
         symbols.checked;
 
 
     // Check character selection
+
     if (
         !useUppercase &&
         !useLowercase &&
@@ -307,32 +309,42 @@ async function generatePassword() {
 
 
     // Loading state
-    generateButton.disabled = true;
 
-    generateButton.textContent =
-        "Generating...";
+    generateButton.disabled =
+        true;
+
+
+    generateButton.innerHTML =
+        "⏳ Generating Secure Passwords...";
+
 
     copyMessage.textContent =
-        "Generating a secure unique password...";
+        `Generating ${count} unique password${count > 1 ? "s" : ""}...`;
 
 
     try {
 
-        // Send request to Flask backend
         const response =
             await fetch(
                 "/api/generate",
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/json"
+
                     },
 
                     body: JSON.stringify({
 
-                        length: length,
+                        length:
+                            length,
+
+                        count:
+                            count,
 
                         uppercase:
                             useUppercase,
@@ -345,7 +357,9 @@ async function generatePassword() {
 
                         symbols:
                             useSymbols
+
                     })
+
                 }
             );
 
@@ -363,99 +377,55 @@ async function generatePassword() {
                 data.error ||
                 "Password generation failed."
             );
+
         }
 
 
-        // Show password
-        generatedPassword.value =
-            data.password;
+        // Display passwords
 
-
-        // Update strength
-        updateStrength(
-            data.password
+        displayPasswords(
+            data.passwords
         );
 
 
         copyMessage.textContent =
-            "New unique password generated.";
+            `${data.count} unique password${data.count > 1 ? "s" : ""} generated successfully.`;
 
 
     } catch (error) {
 
         console.error(
-            "Backend error:",
+            "Generation error:",
             error
         );
 
 
-        // Local fallback
-        try {
+        copyMessage.textContent =
+            error.message ||
+            "Unable to generate passwords. Please try again.";
 
-            const password =
-                generateLocalPassword(
-
-                    length,
-
-                    useUppercase,
-
-                    useLowercase,
-
-                    useNumbers,
-
-                    useSymbols
-
-                );
-
-
-            generatedPassword.value =
-                password;
-
-
-            updateStrength(
-                password
-            );
-
-
-            copyMessage.textContent =
-                "Password generated. Server duplicate protection is unavailable.";
-
-
-        } catch (localError) {
-
-            copyMessage.textContent =
-                localError.message;
-        }
 
     } finally {
 
         generateButton.disabled =
             false;
 
-        generateButton.textContent =
-            "✨ Generate Secure Password";
+
+        generateButton.innerHTML =
+            "✨ Generate Secure Passwords";
+
     }
 }
 
 
 // ==========================================
-// Copy Password
+// Copy Individual Password
 // ==========================================
 
-async function copyPassword() {
-
-    const password =
-        generatedPassword.value;
-
-
-    if (!password) {
-
-        copyMessage.textContent =
-            "Generate a password first.";
-
-        return;
-    }
-
+async function copyPassword(
+    password,
+    button
+) {
 
     try {
 
@@ -464,25 +434,76 @@ async function copyPassword() {
         );
 
 
+        const originalText =
+            button.textContent;
+
+
+        button.textContent =
+            "Copied!";
+
+
         copyMessage.textContent =
             "Password copied to clipboard!";
+
+
+        setTimeout(
+            () => {
+
+                button.textContent =
+                    originalText;
+
+            },
+            1500
+        );
 
 
     } catch (error) {
 
-        generatedPassword.select();
-
-        document.execCommand("copy");
-
-
         copyMessage.textContent =
-            "Password copied to clipboard!";
+            "Unable to copy password.";
+
     }
 }
 
 
 // ==========================================
-// Length Slider
+// Copy Button Event Handling
+// ==========================================
+
+passwordResults.addEventListener(
+    "click",
+    function (event) {
+
+        const button =
+            event.target.closest(
+                ".copy-password-button"
+            );
+
+
+        if (!button) {
+
+            return;
+
+        }
+
+
+        const password =
+            decodeURIComponent(
+                button.dataset.password
+            );
+
+
+        copyPassword(
+            password,
+            button
+        );
+
+    }
+);
+
+
+// ==========================================
+// Password Length Slider
 // ==========================================
 
 passwordLength.addEventListener(
@@ -497,22 +518,27 @@ passwordLength.addEventListener(
 
 
 // ==========================================
+// Password Count Slider
+// ==========================================
+
+passwordCount.addEventListener(
+    "input",
+    function () {
+
+        countValue.textContent =
+            this.value;
+
+    }
+);
+
+
+// ==========================================
 // Generate Button
 // ==========================================
 
 generateButton.addEventListener(
     "click",
-    generatePassword
-);
-
-
-// ==========================================
-// Copy Button
-// ==========================================
-
-copyButton.addEventListener(
-    "click",
-    copyPassword
+    generatePasswords
 );
 
 
@@ -522,13 +548,7 @@ copyButton.addEventListener(
 // No password generated automatically.
 // ==========================================
 
-generatedPassword.value = "";
-
-strengthText.textContent =
-    "Not Generated";
-
-strengthFill.style.width =
-    "0%";
+passwordResults.innerHTML = "";
 
 copyMessage.textContent =
-    "Click Generate Secure Password to create a password.";
+    "Click Generate Secure Passwords to create passwords.";

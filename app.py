@@ -1,497 +1,138 @@
 from flask import Flask, request, jsonify, send_from_directory
-import sqlite3
+import os
 import secrets
 import string
 import hashlib
-import os
-
+import psycopg
 
 app = Flask(__name__)
 
-
-# ==========================================
-# Database
-# ==========================================
-
-DATABASE = "database/passwords.db"
-
-
-# ==========================================
-# Character Sets
-# ==========================================
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 UPPERCASE = string.ascii_uppercase
-
 LOWERCASE = string.ascii_lowercase
-
 NUMBERS = string.digits
-
 SYMBOLS = "!@#$%^&*()-_=+[]{};:,.?/"
 
 
-# ==========================================
-# Initialize Database
-# ==========================================
+def get_connection():
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL is missing.")
+    return psycopg.connect(DATABASE_URL)
+
 
 def initialize_database():
-
-    os.makedirs(
-        "database",
-        exist_ok=True
-    )
-
-    connection = sqlite3.connect(
-        DATABASE
-    )
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS generated_passwords (
-
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            password_hash TEXT UNIQUE NOT NULL,
-
-            created_at TIMESTAMP
-            DEFAULT CURRENT_TIMESTAMP
-
-        )
-    """)
-
-    connection.commit()
-
-    connection.close()
+    with get_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS generated_passwords (
+                id BIGSERIAL PRIMARY KEY,
+                password_hash TEXT UNIQUE NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
 
-# ==========================================
-# Hash Password
-# ==========================================
+def generate_password(length, options):
+    sets = []
+    if options["uppercase"]:
+        sets.append(UPPERCASE)
+    if options["lowercase"]:
+        sets.append(LOWERCASE)
+    if options["numbers"]:
+        sets.append(NUMBERS)
+    if options["symbols"]:
+        sets.append(SYMBOLS)
 
-def hash_password(password):
-
-    return hashlib.sha256(
-        password.encode("utf-8")
-    ).hexdigest()
-
-
-# ==========================================
-# Save Password
-# ==========================================
-
-def save_password(password):
-
-    password_hash = hash_password(
-        password
-    )
-
-    connection = sqlite3.connect(
-        DATABASE
-    )
-
-    cursor = connection.cursor()
-
-    try:
-
-        cursor.execute(
-            """
-            INSERT INTO generated_passwords
-            (password_hash)
-            VALUES (?)
-            """,
-            (password_hash,)
-        )
-
-        connection.commit()
-
-        success = True
-
-    except sqlite3.IntegrityError:
-
-        success = False
-
-    finally:
-
-        connection.close()
-
-    return success
-
-
-# ==========================================
-# Generate Password
-# ==========================================
-
-def generate_password(
-    length,
-    use_uppercase,
-    use_lowercase,
-    use_numbers,
-    use_symbols
-):
-
-    character_sets = []
-
-
-    if use_uppercase:
-
-        character_sets.append(
-            UPPERCASE
-        )
-
-
-    if use_lowercase:
-
-        character_sets.append(
-            LOWERCASE
-        )
-
-
-    if use_numbers:
-
-        character_sets.append(
-            NUMBERS
-        )
-
-
-    if use_symbols:
-
-        character_sets.append(
-            SYMBOLS
-        )
-
-
-    if not character_sets:
-
-        raise ValueError(
-            "Select at least one character type."
-        )
-
-
+    if not sets:
+        raise ValueError("Select at least one character type.")
     if length < 8 or length > 64:
+        raise ValueError("Password length must be between 8 and 64.")
+    if length < len(sets):
+        raise ValueError("Password length is too short.")
 
-        raise ValueError(
-            "Password length must be between 8 and 64."
-        )
+    chars = [secrets.choice(s) for s in sets]
+    pool = "".join(sets)
 
+    while len(chars) < length:
+        chars.append(secrets.choice(pool))
 
-    if length < len(character_sets):
-
-        raise ValueError(
-            "Password length is too short for the selected character types."
-        )
-
-
-    password_characters = []
+    secrets.SystemRandom().shuffle(chars)
+    return "".join(chars)
 
 
-    # At least one character
-    # from every selected type
-
-    for character_set in character_sets:
-
-        password_characters.append(
-            secrets.choice(character_set)
-        )
-
-
-    pool = "".join(
-        character_sets
-    )
-
-
-    # Fill remaining characters
-
-    while len(password_characters) < length:
-
-        password_characters.append(
-            secrets.choice(pool)
-        )
-
-
-    # Secure shuffle
-
-    secrets.SystemRandom().shuffle(
-        password_characters
-    )
-
-
-    return "".join(
-        password_characters
-    )
-
-
-# ==========================================
-# Generate Globally Unique Password
-# ==========================================
-
-def generate_unique_password(
-    length,
-    use_uppercase,
-    use_lowercase,
-    use_numbers,
-    use_symbols
-):
-
+def generate_unique_password(length, options):
     for _ in range(100):
+        password = generate_password(length, options)
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
 
-        password = generate_password(
+        with get_connection() as conn:
+            result = conn.execute("""
+                INSERT INTO generated_passwords (password_hash)
+                VALUES (%s)
+                ON CONFLICT (password_hash) DO NOTHING
+                RETURNING id
+            """, (password_hash,))
 
-            length,
+            if result.fetchone():
+                return password
 
-            use_uppercase,
+    raise RuntimeError("Could not generate a unique password.")
 
-            use_lowercase,
-
-            use_numbers,
-
-            use_symbols
-
-        )
-
-
-        # Database UNIQUE constraint
-        # guarantees no duplicate hash
-
-        if save_password(password):
-
-            return password
-
-
-    raise RuntimeError(
-        "Could not generate a unique password."
-    )
-
-
-# ==========================================
-# Home Page
-# ==========================================
 
 @app.route("/")
 def home():
+    return send_from_directory(".", "index.html")
 
-    return send_from_directory(
-        ".",
-        "index.html"
-    )
-
-
-# ==========================================
-# CSS
-# ==========================================
 
 @app.route("/style.css")
 def style():
+    return send_from_directory(".", "style.css")
 
-    return send_from_directory(
-        ".",
-        "style.css"
-    )
-
-
-# ==========================================
-# JavaScript
-# ==========================================
 
 @app.route("/script.js")
 def script():
-
-    return send_from_directory(
-        ".",
-        "script.js"
-    )
+    return send_from_directory(".", "script.js")
 
 
-# ==========================================
-# Generate Passwords API
-# ==========================================
-
-@app.route(
-    "/api/generate",
-    methods=["POST"]
-)
+@app.route("/api/generate", methods=["POST"])
 def generate():
-
     try:
+        data = request.get_json(silent=True) or {}
 
-        data = request.get_json()
-
-
-        # Password length
-
-        length = int(
-            data.get(
-                "length",
-                16
-            )
-        )
-
-
-        # Number of passwords
-
-        count = int(
-            data.get(
-                "count",
-                1
-            )
-        )
-
-
-        # Security limits
+        length = int(data.get("length", 16))
+        count = int(data.get("count", 1))
 
         if count < 1 or count > 10:
+            return jsonify(success=False, error="Count must be 1 to 10."), 400
 
-            return jsonify({
+        options = {
+            "uppercase": data.get("uppercase", True) is True,
+            "lowercase": data.get("lowercase", True) is True,
+            "numbers": data.get("numbers", True) is True,
+            "symbols": data.get("symbols", True) is True
+        }
 
-                "success": False,
+        initialize_database()
 
-                "error":
-                    "Password count must be between 1 and 10."
+        passwords = [
+            generate_unique_password(length, options)
+            for _ in range(count)
+        ]
 
-            }), 400
+        return jsonify(success=True, passwords=passwords, count=len(passwords))
 
+    except (ValueError, TypeError) as error:
+        return jsonify(success=False, error=str(error)), 400
 
-        uppercase = bool(
-            data.get(
-                "uppercase",
-                True
-            )
-        )
+    except Exception:
+        app.logger.exception("Password generation failed")
+        return jsonify(success=False, error="Password generation failed. Check database connection."), 500
 
-
-        lowercase = bool(
-            data.get(
-                "lowercase",
-                True
-            )
-        )
-
-
-        numbers = bool(
-            data.get(
-                "numbers",
-                True
-            )
-        )
-
-
-        symbols = bool(
-            data.get(
-                "symbols",
-                True
-            )
-        )
-
-
-        passwords = []
-
-
-        # Generate each password
-        # and store immediately
-
-        for _ in range(count):
-
-            password = generate_unique_password(
-
-                length,
-
-                uppercase,
-
-                lowercase,
-
-                numbers,
-
-                symbols
-
-            )
-
-            passwords.append(
-                password
-            )
-
-
-        return jsonify({
-
-            "success": True,
-
-            "passwords": passwords,
-
-            "count": len(passwords)
-
-        })
-
-
-    except ValueError as error:
-
-        return jsonify({
-
-            "success": False,
-
-            "error": str(error)
-
-        }), 400
-
-
-    except Exception as error:
-
-        print(
-            "ERROR:",
-            error
-        )
-
-
-        return jsonify({
-
-            "success": False,
-
-            "error":
-                "Password generation failed."
-
-        }), 500
-
-
-# ==========================================
-# Health Check
-# ==========================================
 
 @app.route("/health")
 def health():
+    return jsonify(status="running")
 
-    return jsonify({
-
-        "status":
-            "running"
-
-    })
-
-
-# ==========================================
-# Start Application
-# ==========================================
 
 if __name__ == "__main__":
-
-    initialize_database()
-
-
-    print()
-
-    print(
-        "Password Generator Pro is running..."
-    )
-
-    print(
-        "Open: http://127.0.0.1:5000"
-    )
-
-    print()
-
-
-    app.run(
-
-        host="0.0.0.0",
-
-        port=5000,
-
-        debug=True
-
-    )
+    app.run(host="0.0.0.0", port=5000, debug=True)

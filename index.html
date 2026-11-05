@@ -1,461 +1,210 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#031b1e">
     <title>Password Generator Pro</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <!-- HEADER -->
-    <header class="site-header">
+<header class="site-header">
+    <div class="container header-content">
+        <div class="brand">
+            <div class="brand-icon">🔐</div>
+            <div>
+                <h1>Password Generator <span>Pro</span></h1>
+                <p>Secure Password Generator Pro</p>
+            </div>
+        </div>
+        <div class="security-badge">◉ Secure Generation</div>
+    </div>
+</header>
 
-        <div class="container header-content">
+<main class="container">
 
-            <div class="brand">
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-label">🔒 YOUR SECURITY, OUR PRIORITY</span>
+            <h2>Generate <span>Strong</span> &amp;<br>Unique Passwords</h2>
+            <p>Create secure passwords with customizable options and intelligent duplicate prevention.</p>
 
-                <div class="brand-icon">
-                    🔐
+            <div class="hero-points">
+                <span>⚡ Fast</span>
+                <span>🛡️ Secure</span>
+                <span>💎 Customizable</span>
+            </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="shield-art">
+                <div class="shield-inner">
+                    <div class="big-lock">🔒</div>
+                </div>
+            </div>
+            <div class="laptop-art">
+                <div class="laptop-screen">🔒</div>
+                <div class="laptop-base"></div>
+            </div>
+            <span class="spark spark-one">✦</span>
+            <span class="spark spark-two">✧</span>
+            <span class="spark spark-three">✦</span>
+        </div>
+    </section>
+
+    <section class="generator-section">
+        <div class="generator-card">
+
+            <div class="controls-section">
+                <div class="section-heading">
+                    <div class="heading-icon">⚙️</div>
+                    <div>
+                        <span class="section-label">CUSTOMIZE</span>
+                        <h3>Password Settings</h3>
+                        <p>Customize your password preferences</p>
+                    </div>
                 </div>
 
-                <div>
-                    <h1>Password Generator</h1>
-
-                    <p>
-                        Secure Password Generator Pro
-                    </p>
+                <div class="length-control">
+                    <div class="control-header">
+                        <label for="passwordLength">Password Length</label>
+                        <span id="lengthValue">16</span>
+                    </div>
+                    <input type="range" id="passwordLength" min="8" max="64" value="16">
+                    <div class="range-labels"><span>8</span><span>64</span></div>
                 </div>
 
+                <div class="count-control">
+                    <div class="control-header">
+                        <label for="passwordCount">Password Count</label>
+                        <span id="countValue">5</span>
+                    </div>
+                    <input type="range" id="passwordCount" min="1" max="10" value="5">
+                    <div class="range-labels"><span>1</span><span>10</span></div>
+                </div>
+
+                <div class="options-title">Character Types</div>
+
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="checkbox" class="custom-checkbox" id="uppercase" checked>
+                        <span class="option-icon">A</span>
+                        <span class="option-content">
+                            <strong>Uppercase</strong>
+                            <small>A – Z</small>
+                        </span>
+                    </label>
+
+                    <label class="option-card">
+                        <input type="checkbox" class="custom-checkbox" id="lowercase" checked>
+                        <span class="option-icon">a</span>
+                        <span class="option-content">
+                            <strong>Lowercase</strong>
+                            <small>a – z</small>
+                        </span>
+                    </label>
+
+                    <label class="option-card">
+                        <input type="checkbox" class="custom-checkbox" id="numbers" checked>
+                        <span class="option-icon">#</span>
+                        <span class="option-content">
+                            <strong>Numbers</strong>
+                            <small>0 – 9</small>
+                        </span>
+                    </label>
+
+                    <label class="option-card">
+                        <input type="checkbox" class="custom-checkbox" id="symbols" checked>
+                        <span class="option-icon">@</span>
+                        <span class="option-content">
+                            <strong>Symbols</strong>
+                            <small>! @ # $</small>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="button" class="generate-button" id="generateButton">
+                    ✨ Generate Secure Passwords →
+                </button>
+
+                <div class="security-info">
+                    <span class="security-info-icon">🛡️</span>
+                    <div>
+                        <strong>Secure &amp; Unique Generation</strong>
+                        <p>Every generated password is checked against previously generated passwords.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="security-badge">
-                🛡 Secure Generation
+            <div class="password-display-section">
+                <div class="section-heading results-heading">
+                    <div class="heading-icon">🛡️</div>
+                    <div>
+                        <span class="section-label">GENERATED PASSWORDS</span>
+                        <h3>Your Secure Passwords</h3>
+                        <p>Copy your password and use it safely</p>
+                    </div>
+                    <span class="unique-badge">✓ Unique</span>
+                </div>
+
+                <div class="password-results" id="passwordResults"></div>
+
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-shield">🔒</div>
+                    <h3>Ready to Generate!</h3>
+                    <p>Click the button to create your secure passwords.</p>
+                </div>
+
+                <p class="copy-message" id="copyMessage">
+                    Click Generate Secure Passwords to create passwords.
+                </p>
+
+                <div class="bottom-security">
+                    <span>💡</span>
+                    <p>Strong passwords help protect you from hackers and cyber threats.</p>
+                    <span>♥</span>
+                </div>
             </div>
 
         </div>
-
-    </header>
-
-
-    <!-- MAIN -->
-    <main class="container">
-
-        <!-- HERO -->
-        <section class="hero">
-
-            <span class="section-label">
-                PASSWORD SECURITY TOOL
-            </span>
-
-            <h2>
-                Generate Strong &amp; Unique Passwords
-            </h2>
-
-            <p>
-                Create secure passwords with customizable
-                length, character types and intelligent
-                duplicate prevention.
-            </p>
-
-        </section>
-
-
-        <!-- GENERATOR -->
-        <section class="generator-section">
-
-            <div class="generator-card">
-
-
-                <!-- PASSWORD RESULTS -->
-                <div class="password-display-section">
-
-                    <div class="section-heading">
-
-                        <div>
-
-                            <span class="section-label">
-                                GENERATED PASSWORDS
-                            </span>
-
-                            <h3>
-                                Your Secure Passwords
-                            </h3>
-
-                        </div>
-
-                        <span
-                            class="unique-badge"
-                            id="uniqueBadge"
-                        >
-                            ✓ Unique
-                        </span>
-
-                    </div>
-
-
-                    <!-- Password cards will appear here -->
-                    <div
-                        id="passwordResults"
-                        class="password-results"
-                    ></div>
-
-
-                    <p
-                        class="copy-message"
-                        id="copyMessage"
-                    >
-                        Click Generate Secure Passwords
-                        to create passwords.
-                    </p>
-
-                </div>
-
-
-                <!-- PASSWORD SETTINGS -->
-                <div class="controls-section">
-
-                    <span class="section-label">
-                        CUSTOMIZE
-                    </span>
-
-                    <h3>
-                        Password Settings
-                    </h3>
-
-
-                    <!-- LENGTH -->
-                    <div class="length-control">
-
-                        <div class="control-header">
-
-                            <label for="passwordLength">
-                                Password Length
-                            </label>
-
-                            <span id="lengthValue">
-                                16
-                            </span>
-
-                        </div>
-
-
-                        <input
-                            type="range"
-                            id="passwordLength"
-                            min="8"
-                            max="64"
-                            value="16"
-                        >
-
-
-                        <div class="range-labels">
-
-                            <span>8</span>
-
-                            <span>64</span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- NUMBER OF PASSWORDS -->
-                    <div class="count-control">
-
-                        <div class="control-header">
-
-                            <label for="passwordCount">
-                                Number of Passwords
-                            </label>
-
-                            <span id="countValue">
-                                5
-                            </span>
-
-                        </div>
-
-
-                        <input
-                            type="range"
-                            id="passwordCount"
-                            min="1"
-                            max="10"
-                            value="5"
-                        >
-
-
-                        <div class="range-labels">
-
-                            <span>1</span>
-
-                            <span>10</span>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- CHARACTER OPTIONS -->
-                    <div class="options-grid">
-
-
-                        <label class="option-card">
-
-                            <input
-                                type="checkbox"
-                                id="uppercase"
-                                class="custom-checkbox"
-                                checked
-                            >
-
-                            <span class="option-content">
-
-                                <strong>
-                                    Uppercase
-                                </strong>
-
-                                <small>
-                                    A-Z
-                                </small>
-
-                            </span>
-
-                        </label>
-
-
-                        <label class="option-card">
-
-                            <input
-                                type="checkbox"
-                                id="lowercase"
-                                class="custom-checkbox"
-                                checked
-                            >
-
-                            <span class="option-content">
-
-                                <strong>
-                                    Lowercase
-                                </strong>
-
-                                <small>
-                                    a-z
-                                </small>
-
-                            </span>
-
-                        </label>
-
-
-                        <label class="option-card">
-
-                            <input
-                                type="checkbox"
-                                id="numbers"
-                                class="custom-checkbox"
-                                checked
-                            >
-
-                            <span class="option-content">
-
-                                <strong>
-                                    Numbers
-                                </strong>
-
-                                <small>
-                                    0-9
-                                </small>
-
-                            </span>
-
-                        </label>
-
-
-                        <label class="option-card">
-
-                            <input
-                                type="checkbox"
-                                id="symbols"
-                                class="custom-checkbox"
-                                checked
-                            >
-
-                            <span class="option-content">
-
-                                <strong>
-                                    Symbols
-                                </strong>
-
-                                <small>
-                                    ! @ # $ %
-                                </small>
-
-                            </span>
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- GENERATE BUTTON -->
-                    <button
-                        type="button"
-                        class="generate-button"
-                        id="generateButton"
-                    >
-
-                        <span class="generate-icon">
-                            ✨
-                        </span>
-
-                        Generate Secure Passwords
-
-                    </button>
-
-
-                    <!-- SECURITY INFO -->
-                    <div class="security-info">
-
-                        <div class="security-info-icon">
-                            🔒
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Secure &amp; Unique
-                            </strong>
-
-                            <p>
-                                Passwords are generated using
-                                cryptographically secure
-                                randomness and checked against
-                                previously issued passwords.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- FEATURES -->
-        <section class="features-grid">
-
-
-            <div class="feature-card">
-
-                <div class="feature-icon">
-                    🔐
-                </div>
-
-                <h3>
-                    Secure Generation
-                </h3>
-
-                <p>
-                    Uses cryptographically secure
-                    random generation.
-                </p>
-
-            </div>
-
-
-            <div class="feature-card">
-
-                <div class="feature-icon">
-                    🛡
-                </div>
-
-                <h3>
-                    Duplicate Protection
-                </h3>
-
-                <p>
-                    Previously issued passwords
-                    are tracked to prevent reuse.
-                </p>
-
-            </div>
-
-
-            <div class="feature-card">
-
-                <div class="feature-icon">
-                    ⚙
-                </div>
-
-                <h3>
-                    Customizable
-                </h3>
-
-                <p>
-                    Choose password length,
-                    character types and quantity.
-                </p>
-
-            </div>
-
-
-            <div class="feature-card">
-
-                <div class="feature-icon">
-                    📋
-                </div>
-
-                <h3>
-                    Multiple Generation
-                </h3>
-
-                <p>
-                    Generate multiple unique
-                    passwords in one request.
-                </p>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- FOOTER -->
-    <footer class="site-footer">
-
-        <div class="container footer-content">
-
-            <p>
-                Password Generator Pro
-            </p>
-
-            <p>
-                Secure • Unique • Reliable
-            </p>
-
+    </section>
+
+    <section class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast Generation</h3>
+            <p>Create secure passwords instantly.</p>
         </div>
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Duplicate Protection</h3>
+            <p>Previously generated passwords are avoided.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚙️</div>
+            <h3>Customizable</h3>
+            <p>Choose length and character types.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔢</div>
+            <h3>Multiple Generation</h3>
+            <p>Generate multiple passwords at once.</p>
+        </div>
+    </section>
 
-    </footer>
+</main>
 
+<footer class="site-footer">
+    <div class="container footer-content">
+        <p>© 2026 Password Generator Pro</p>
+        <p>Built for stronger digital security.</p>
+    </div>
+</footer>
 
-    <script src="script.js"></script>
-
+<script src="script.js"></script>
 </body>
-
 </html>
